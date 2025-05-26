@@ -1,5 +1,3 @@
-console.log('loading js tinymce-blazor');
-
 const CreateScriptLoader = () => {
   let unique = 0;
 
@@ -59,7 +57,7 @@ const getGlobal = () => (typeof window !== 'undefined' ? window : global);
 
 const getTiny = () => {
   const global = getGlobal();
-  return global && global.tinymce ? global.tinymce : null;
+  return global && global.hugerte ? global.hugerte : null;
 };
 
 const updateTinyVal = (id, val) => {
