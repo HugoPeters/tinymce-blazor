@@ -66,6 +66,43 @@ const updateTinyVal = (id, val) => {
   }
 };
 
+function setCaretFromPoint(editor, x, y) {
+  const doc = editor.getDoc();
+  let range = null;
+
+  // Chrome / Edge / Safari
+  if (doc.caretRangeFromPoint) {
+    range = doc.caretRangeFromPoint(x, y);
+  }
+  // Firefox
+  else if (doc.caretPositionFromPoint) {
+    const pos = doc.caretPositionFromPoint(x, y);
+    if (pos) {
+      range = doc.createRange();
+      range.setStart(pos.offsetNode, pos.offset);
+      range.collapse(true);
+    }
+  }
+
+  if (range) {
+    editor.selection.setRng(range);
+  }
+}
+
+function forceCaret(editor, x, y, duration = 100) {
+  const start = performance.now();
+
+  const apply = () => {
+    if (performance.now() - start > duration) return;
+
+    setCaretFromPoint(editor, x, y);
+    requestAnimationFrame(apply);
+  };
+
+  requestAnimationFrame(apply);
+}
+
+
 const tinyEventHandler = (() => {
   const eventCache = {};
   const bindEvent = (editor, event, fn) => {
@@ -153,6 +190,14 @@ window.tinymceBlazorWrapper = {
     tinyConf.target = el;
     tinyConf._setup = tinyConf.setup;
     tinyConf.setup = (editor) => {
+
+      editor.once('focus', () => {
+        if (blazorConf.conf.tzSetCaretOnInit) {
+          forceCaret(editor, blazorConf.conf.tzCaretClientPos.x, blazorConf.conf.tzCaretClientPos.y);
+          blazorConf.conf.tzSetCaretOnInit = false;
+        }
+      });
+
       tinyEventHandler.bindEvent(editor, 'init', (e) => dotNetRef.invokeMethodAsync('GetValue').then(value => { editor.setContent(value); }));
       tinyEventHandler.bindEvent(editor, 'change', (e) => { dotNetRef.invokeMethodAsync('OnChange'); });
       tinyEventHandler.bindEvent(editor, 'input', (e) => { dotNetRef.invokeMethodAsync('OnInput'); });
@@ -166,8 +211,8 @@ window.tinymceBlazorWrapper = {
       }
     }
 
-    if (blazorConf.tzFocusOnInit) {
-      tinyConf.init_instance_callback = (editor) => {
+    tinyConf.init_instance_callback = (editor) => {
+      if (blazorConf.tzFocusOnInit) {
         editor.focus();
       }
     }
