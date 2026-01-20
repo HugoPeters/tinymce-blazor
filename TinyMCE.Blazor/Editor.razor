@@ -63,6 +63,7 @@
   [Parameter] public Dictionary<string, object> Conf { get; set; } = new Dictionary<string, object>();
   [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>();
   [Parameter] public EventCallback<string> ValueChanged { get; set; }
+  [Parameter] public bool FocusOnInit { get; set; }
   #nullable restore
 
   #pragma warning disable BL0007
@@ -296,6 +297,9 @@
         _readonly = merged["readonly"] is bool ? (bool)merged["readonly"] : false;
       }
       blazorConf.Add("readonly", Readonly);
+      blazorConf.Add("tzFocusOnInit", FocusOnInit);
+
+
       // TBD: Load the events
         @*foreach (KeyValuePair<string, object> kvp in AdditionalAttributes)
       {

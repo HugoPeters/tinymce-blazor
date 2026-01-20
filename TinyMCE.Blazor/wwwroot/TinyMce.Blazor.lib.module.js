@@ -166,6 +166,12 @@ window.tinymceBlazorWrapper = {
       }
     }
 
+    if (blazorConf.tzFocusOnInit) {
+      tinyConf.init_instance_callback = (editor) => {
+        editor.focus();
+      }
+    }
+
     if (getTiny()) {
       getTiny().init(tinyConf);
     } else {
