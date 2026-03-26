@@ -198,6 +198,10 @@ window.tinymceBlazorWrapper = {
         }
       });
 
+      if (blazorConf.tzWatchBlur) {
+        tinyEventHandler.bindEvent(editor, 'blur', (e) => { dotNetRef.invokeMethodAsync('OnBlur'); });
+      }
+
       tinyEventHandler.bindEvent(editor, 'init', (e) => dotNetRef.invokeMethodAsync('GetValue').then(value => { editor.setContent(value); }));
       tinyEventHandler.bindEvent(editor, 'change', (e) => { dotNetRef.invokeMethodAsync('OnChange'); });
       tinyEventHandler.bindEvent(editor, 'input', (e) => { dotNetRef.invokeMethodAsync('OnInput'); });

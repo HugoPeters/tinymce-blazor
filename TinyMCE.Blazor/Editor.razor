@@ -63,6 +63,7 @@
   [Parameter] public Dictionary<string, object> Conf { get; set; } = new Dictionary<string, object>();
   [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> AdditionalAttributes { get; set; } = new Dictionary<string, object>();
   [Parameter] public EventCallback<string> ValueChanged { get; set; }
+  [Parameter] public EventCallback OnBlur { get; set; }
   [Parameter] public bool FocusOnInit { get; set; }
   #nullable restore
 
@@ -185,6 +186,12 @@
     }
   }
 
+  [JSInvokable("OnBlur")]
+  public async Task HandleOnBlur()
+  {
+    await OnBlur.InvokeAsync();
+  }
+
   private void NotifyFieldChanged()
   {
     if (Field == null)
@@ -298,6 +305,9 @@
       }
       blazorConf.Add("readonly", Readonly);
       blazorConf.Add("tzFocusOnInit", FocusOnInit);
+
+      if (OnBlur.HasDelegate)
+        blazorConf.Add("tzWatchBlur", true);
 
 
       // TBD: Load the events
